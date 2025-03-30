@@ -27,7 +27,7 @@ window.addEventListener("DOMContentLoaded", () => {
     sourceVideo = video;
     sourceVideo.width = cameraConfig.video.width;
     sourceVideo.height = cameraConfig.video.height;
-    sourceVideo.play();
+    // sourceVideo.play();
 
     // init target canvas
     initTargetCanvas();
@@ -36,10 +36,11 @@ window.addEventListener("DOMContentLoaded", () => {
     initRenderer();
 
     return new Promise(resolve => {
-      sourceVideo.addEventListener("loadeddata", event => {
-        console.log("Camera is ready");
-        resolve();
-      });
+      // sourceVideo.addEventListener("loadeddata", event => {
+      //   console.log("Camera is ready");
+      //   resolve();
+      // });
+      resolve();
     });
   })
   .then(_ => {
@@ -48,7 +49,8 @@ window.addEventListener("DOMContentLoaded", () => {
   .then(_ => {
 
     console.log("AR controller initialized");
-    startProcessing();
+    // startProcessing();
+    setTimeout(startProcessing, 2000);
   });
 
 });
@@ -72,13 +74,14 @@ async function initCamera(config) {
 
   // initialize video source
   const video = document.querySelector("#sourcevideo");
-  const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  video.srcObject = stream;
+  // const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  // video.srcObject = stream;
 
   return new Promise(resolve => {
-    video.onloadedmetadata = () => {
-      resolve(video);
-    };
+    // video.onloadedmetadata = () => {
+    //   resolve(video);
+    // };
+    resolve(video);
   });
 };
 
@@ -88,8 +91,12 @@ async function initAR() {
   // Note: this camera_para.dat file works well for most built-in laptop webcams
   // It does NOT work very well for newer iPhone models (X / XS / 11)
   // The cube will be off quite a bit.
-  arc = await ARToolkit.ARController.initWithDimensions(
-    cameraConfig.video.width, cameraConfig.video.height,
+  // arc = await ARToolkit.ARController.initWithDimensions(
+  //   cameraConfig.video.width, cameraConfig.video.height,
+  //   '/data/camera_para.dat'
+  // );
+  arc = await ARToolkit.ARController.initWithImage(
+    sourceVideo,
     '/data/camera_para.dat'
   );
   console.log("AR Controller initialized");
@@ -133,15 +140,22 @@ function initRenderer() {
   markerRoot.matrixAutoUpdate = false;
 
   // create a simple cube
-  const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
-  );
+  // const cube = new THREE.Mesh(
+  //   new THREE.BoxGeometry(1, 1, 1),
+  //   new THREE.MeshLambertMaterial({ color: 0xffffff, wireframe: false })
+  // );
 
-  // position the cube on top of the marker
-  cube.position.z = 0.5;
+  // // position the cube on top of the marker
+  // cube.position.z = 0.5;
 
-  markerRoot.add(cube);
+  var pin = THREE.ImageUtils.loadTexture( '/images/brewer.png' );
+
+  var marker = new THREE.SpriteMaterial( { map: pin } );
+  var sprite = new THREE.Sprite( marker );
+  sprite.position.z = 0;
+
+  // markerRoot.add(cube);
+  markerRoot.add(sprite);
   scene.add(markerRoot);  
 }
 
@@ -172,18 +186,24 @@ function startProcessing() {
       }
     }
 
+    console.log({markerNum});
+    console.log({hiroMarkerNum});
     if(hiroMarkerNum !== false) {
       
       // HIRO marker found
-      if(markerRoot.visible) {
-        arc.getTransMatSquareCont(
-          hiroMarkerNum, 1, markerRoot.markerMatrix, markerRoot.markerMatrix
-        );
-      } else {
-        arc.getTransMatSquare(
-          hiroMarkerNum /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix
-        );
-      }
+      // if(markerRoot.visible) {
+      //   arc.getTransMatSquareCont(
+      //     hiroMarkerNum, 1, markerRoot.markerMatrix, markerRoot.markerMatrix
+      //   );
+      // } else {
+      //   arc.getTransMatSquare(
+      //     hiroMarkerNum /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix
+      //   );
+      // }
+
+      arc.getTransMatSquare(
+        hiroMarkerNum /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix
+      );
 
       // show marker root
       markerRoot.visible = true;
@@ -204,8 +224,12 @@ function startProcessing() {
     renderer.clear();
     renderer.render(scene, camera);
 
+    if (markerRoot.visible) {
+      return;
+    }
+
     // process next frame
-    window.requestAnimationFrame(processFrame);
+    // window.requestAnimationFrame(processFrame);
   };
 
 
