@@ -49,8 +49,8 @@ window.addEventListener("DOMContentLoaded", () => {
   .then(_ => {
 
     console.log("AR controller initialized");
-    // startProcessing();
-    setTimeout(startProcessing, 2000);
+    startProcessing();
+    // setTimeout(startProcessing, 2000);
   });
 
 });
@@ -150,12 +150,13 @@ function initRenderer() {
 
   var pin = THREE.ImageUtils.loadTexture( '/images/brewer.png' );
 
-  var marker = new THREE.SpriteMaterial( { map: pin } );
-  var sprite = new THREE.Sprite( marker );
-  sprite.position.z = 0;
+  const geometry = new THREE.PlaneGeometry( 1, 1 );
+  const material = new THREE.MeshBasicMaterial({ map: pin });
+  // const material = new THREE.MeshLambertMaterial({ map: pin })
+  const plane = new THREE.Mesh( geometry, material );
 
   // markerRoot.add(cube);
-  markerRoot.add(sprite);
+  markerRoot.add(plane);
   scene.add(markerRoot);  
 }
 
