@@ -2,7 +2,7 @@ import 'reset-css';
 import './css/style.css';
 
 import * as THREE from 'three';
-import ARToolkit from 'artoolkit5-js';
+import ARToolkit from '@ar-js-org/artoolkit5-js';
 import cameraConfig from './config';
 
 let sourceVideo;
