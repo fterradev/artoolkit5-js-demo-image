@@ -148,7 +148,8 @@ function initRenderer() {
   // // position the cube on top of the marker
   // cube.position.z = 0.5;
 
-  var pin = THREE.ImageUtils.loadTexture( '/images/brewer.png' );
+  // var pin = THREE.ImageUtils.loadTexture( '/images/brewer.png' );
+  var pin = new THREE.TextureLoader().load('/images/brewer.png' );
 
   const geometry = new THREE.PlaneGeometry( 1, 1 );
   const material = new THREE.MeshBasicMaterial({ map: pin });
