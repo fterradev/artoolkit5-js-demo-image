@@ -17,7 +17,6 @@ let markerId;
 // used to render THREE.js scene
 let renderer, scene, camera, markerRoot;
 
-
 window.addEventListener("DOMContentLoaded", () => {
 
   initCamera(cameraConfig)
@@ -156,6 +155,9 @@ function initRenderer() {
   // const material = new THREE.MeshLambertMaterial({ map: pin })
   const plane = new THREE.Mesh( geometry, material );
 
+  // Use this to get a "default" view of the markerRoot
+  // plane.position.z = -2;
+
   // markerRoot.add(cube);
   markerRoot.add(plane);
   scene.add(markerRoot);  
@@ -215,6 +217,21 @@ function startProcessing() {
         arc.transMatToGLMat(markerRoot.markerMatrix),
         markerRoot.matrix.elements
       );
+
+      // markerRoot.matrix.elements = [0.8674437212769462, -0.06138414161301458, -0.49373411627680386, 0, -0.0019110548031015656, 0.9919415432598282, -0.12668197434855205, 0, 0.497531645512864, 0.11083303620198617, 0.8603361551158427, 0, -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1];
+      // markerRoot.matrix.elements = [1, -0, -0.5, 0, -0, 1, -0, 0, 0.5, 0, 1, 0, -0, -0, -2, 1];
+      
+      /*
+      This is another way to get a "default" view of the markerRoot.
+      (through a transformation matrix)
+      */
+      // markerRoot.matrix.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -2, 1];
+
+      // The identity matrix
+      // markerRoot.matrix.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+      console.log(markerRoot.matrix.elements);
+      console.log(markerRoot);
 
     } else {
 
