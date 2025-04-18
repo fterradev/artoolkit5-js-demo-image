@@ -122,7 +122,14 @@ function initRenderer() {
 
   // init camera
   camera = new THREE.Camera();
-  camera.matrixAutoUpdate = false;
+  // camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+  
+  /*
+  If matrixAutoUpdate is false, then we need to call camera.updateMatrix() after moving it.
+  */
+  // camera.matrixAutoUpdate = false;
+  
+  // camera.position.z = 1;
 
   scene = new THREE.Scene();
   scene.add(camera);
@@ -136,6 +143,11 @@ function initRenderer() {
 
   markerRoot = new THREE.Object3D();
   markerRoot.markerMatrix = new Float64Array(12);
+
+  /*
+  If false, we need to call updateMatrix later.
+  But for some reason, if it's true, it won't get the AR transform.
+  */
   markerRoot.matrixAutoUpdate = false;
 
   // create a simple cube
@@ -156,7 +168,11 @@ function initRenderer() {
   const plane = new THREE.Mesh( geometry, material );
 
   // Use this to get a "default" view of the markerRoot
-  // plane.position.z = -2;
+  // plane.position.z = -1;
+  
+  // Or this:
+  markerRoot.position.z = -1;
+  markerRoot.updateMatrix();
 
   // markerRoot.add(cube);
   markerRoot.add(plane);
