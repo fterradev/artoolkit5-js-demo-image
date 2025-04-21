@@ -129,7 +129,12 @@ function initRenderer() {
   */
   // camera.matrixAutoUpdate = false;
   
-  // camera.position.z = 1;
+  // camera.position.z = 2;
+  
+  // Apply transformation to the camera
+  // const m = new THREE.Matrix4(...[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1]);
+  // m.transpose();
+  // camera.applyMatrix4(m);
 
   scene = new THREE.Scene();
   scene.add(camera);
@@ -221,12 +226,12 @@ function startProcessing() {
       //   );
       // }
 
+      // show marker root
+      markerRoot.visible = true;
+
       arc.getTransMatSquare(
         hiroMarkerNum /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix
       );
-
-      // show marker root
-      markerRoot.visible = true;
 
       // position camera
       arc.arglCameraViewRHf(
@@ -234,9 +239,12 @@ function startProcessing() {
         markerRoot.matrix.elements
       );
 
-      // markerRoot.matrix.elements = [0.8674437212769462, -0.06138414161301458, -0.49373411627680386, 0, -0.0019110548031015656, 0.9919415432598282, -0.12668197434855205, 0, 0.497531645512864, 0.11083303620198617, 0.8603361551158427, 0, -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1];
-      // markerRoot.matrix.elements = [1, -0, -0.5, 0, -0, 1, -0, 0, 0.5, 0, 1, 0, -0, -0, -2, 1];
+      let preCalculatedMatrix = [0.8674437212769462, -0.06138414161301458, -0.49373411627680386, 0, -0.0019110548031015656, 0.9919415432598282, -0.12668197434855205, 0, 0.497531645512864, 0.11083303620198617, 0.8603361551158427, 0, -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1];
+      preCalculatedMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -3, 1]
+      preCalculatedMatrix = [1, -0, -0.5, 0, -0, 1, -0, 0, 0.5, 0, 1, 0, -0, -0, -2, 1];
       
+      // markerRoot.matrix.elements = preCalculatedMatrix;
+
       /*
       This is another way to get a "default" view of the markerRoot.
       (through a transformation matrix)
@@ -248,6 +256,7 @@ function startProcessing() {
 
       console.log(markerRoot.matrix.elements);
       console.log(markerRoot);
+      console.log(camera);
 
     } else {
 
