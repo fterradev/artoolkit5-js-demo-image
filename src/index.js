@@ -1,9 +1,9 @@
-import 'reset-css';
-import './css/style.css';
+import "reset-css";
+import "./css/style.css";
 
-import * as THREE from 'three';
-import ARToolkit from '@ar-js-org/artoolkit5-js';
-import cameraConfig from './config';
+import * as THREE from "three";
+import ARToolkit from "@ar-js-org/artoolkit5-js";
+import cameraConfig from "./config";
 
 let sourceVideo;
 let targetCanvas;
@@ -18,48 +18,42 @@ let markerId;
 let renderer, scene, camera, markerRoot;
 
 window.addEventListener("DOMContentLoaded", () => {
-
   initCamera(cameraConfig)
-  .then(video => {
+    .then((video) => {
+      // start camera playback
+      sourceVideo = video;
+      sourceVideo.width = cameraConfig.video.width;
+      sourceVideo.height = cameraConfig.video.height;
+      // sourceVideo.play();
 
-    // start camera playback
-    sourceVideo = video;
-    sourceVideo.width = cameraConfig.video.width;
-    sourceVideo.height = cameraConfig.video.height;
-    // sourceVideo.play();
+      // init target canvas
+      initTargetCanvas();
 
-    // init target canvas
-    initTargetCanvas();
+      // init THREE renderer
+      initRenderer();
 
-    // init THREE renderer
-    initRenderer();
-
-    return new Promise(resolve => {
-      // sourceVideo.addEventListener("loadeddata", event => {
-      //   console.log("Camera is ready");
-      //   resolve();
-      // });
-      resolve();
+      return new Promise((resolve) => {
+        // sourceVideo.addEventListener("loadeddata", event => {
+        //   console.log("Camera is ready");
+        //   resolve();
+        // });
+        resolve();
+      });
+    })
+    .then((_) => {
+      return initAR();
+    })
+    .then((_) => {
+      console.log("AR controller initialized");
+      startProcessing();
+      // setTimeout(startProcessing, 2000);
     });
-  })
-  .then(_ => {
-    return initAR();
-  })
-  .then(_ => {
-
-    console.log("AR controller initialized");
-    startProcessing();
-    // setTimeout(startProcessing, 2000);
-  });
-
 });
-
 
 // initializers
 //------------------------------------------------------------------------------
 
 async function initCamera(config) {
-
   const constraints = {
     audio: false,
     video: {
@@ -67,8 +61,8 @@ async function initCamera(config) {
       facingMode: "user",
       width: config.video.width,
       height: config.video.height,
-      frameRate: { max: config.video.fps }
-    }
+      frameRate: { max: config.video.fps },
+    },
   };
 
   // initialize video source
@@ -76,16 +70,15 @@ async function initCamera(config) {
   // const stream = await navigator.mediaDevices.getUserMedia(constraints);
   // video.srcObject = stream;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     // video.onloadedmetadata = () => {
     //   resolve(video);
     // };
     resolve(video);
   });
-};
+}
 
 async function initAR() {
-
   // init AR controller
   // Note: this camera_para.dat file works well for most built-in laptop webcams
   // It does NOT work very well for newer iPhone models (X / XS / 11)
@@ -96,12 +89,12 @@ async function initAR() {
   // );
   arc = await ARToolkit.ARController.initWithImage(
     sourceVideo,
-    '/data/camera_para.dat'
+    "/data/camera_para.dat"
   );
   console.log("AR Controller initialized");
 
   // add HIRO marker
-  markerId = await arc.artoolkit.addMarker(arc.id, '/data/hiro.patt');
+  markerId = await arc.artoolkit.addMarker(arc.id, "/data/hiro.patt");
   console.log("HIRO marker added with marker ID", markerId);
 }
 
@@ -113,7 +106,6 @@ function initTargetCanvas() {
 }
 
 function initRenderer() {
-
   // create a scene overlaying the video
   renderer = new THREE.WebGLRenderer({ canvas: targetCanvas, alpha: true });
   renderer.setSize(cameraConfig.video.width, cameraConfig.video.height);
@@ -123,14 +115,14 @@ function initRenderer() {
   // init camera
   camera = new THREE.Camera();
   // camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-  
+
   /*
   If matrixAutoUpdate is false, then we need to call camera.updateMatrix() after moving it.
   */
   // camera.matrixAutoUpdate = false;
-  
+
   // camera.position.z = 2;
-  
+
   // Apply transformation to the camera
   // const m = new THREE.Matrix4(...[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, 1]);
   // m.transpose();
@@ -165,35 +157,33 @@ function initRenderer() {
   // cube.position.z = 0.5;
 
   // var pin = THREE.ImageUtils.loadTexture( '/images/brewer.png' );
-  var pin = new THREE.TextureLoader().load('/images/brewer.png' );
+  var pin = new THREE.TextureLoader().load("/images/brewer.png");
 
-  const geometry = new THREE.PlaneGeometry( 1, 1 );
+  const geometry = new THREE.PlaneGeometry(1, 1);
   const material = new THREE.MeshBasicMaterial({ map: pin });
   // const material = new THREE.MeshLambertMaterial({ map: pin })
-  const plane = new THREE.Mesh( geometry, material );
+  const plane = new THREE.Mesh(geometry, material);
 
   // Use this to get a "default" view of the markerRoot
   // plane.position.z = -1;
-  
+
   // Or this:
   markerRoot.position.z = -1;
   markerRoot.updateMatrix();
 
   // markerRoot.add(cube);
   markerRoot.add(plane);
-  scene.add(markerRoot);  
+  scene.add(markerRoot);
 }
 
 // main detection loop
 //------------------------------------------------------------------------------
 function startProcessing() {
-
   const processFrame = () => {
-
     const result = arc.detectMarker(sourceVideo);
-    if(result !== 0) {
+    if (result !== 0) {
       // ARToolkit returning a value !== 0 means an error occured
-      console.log('Error detecting markers');
+      console.log("Error detecting markers");
       return;
     }
 
@@ -202,19 +192,18 @@ function startProcessing() {
     let hiroMarkerNum = false;
 
     // check if one of the detected markers is the HIRO marker
-    for(let i = 0; i < markerNum; i++) {
+    for (let i = 0; i < markerNum; i++) {
       const markerInfo = arc.getMarker(i);
-      if(markerInfo.idPatt == markerId) {
+      if (markerInfo.idPatt == markerId) {
         // store the marker ID from the detection result
         hiroMarkerNum = i;
         break;
       }
     }
 
-    console.log({markerNum});
-    console.log({hiroMarkerNum});
-    if(hiroMarkerNum !== false) {
-      
+    console.log({ markerNum });
+    console.log({ hiroMarkerNum });
+    if (hiroMarkerNum !== false) {
       // HIRO marker found
       // if(markerRoot.visible) {
       //   arc.getTransMatSquareCont(
@@ -230,7 +219,9 @@ function startProcessing() {
       markerRoot.visible = true;
 
       arc.getTransMatSquare(
-        hiroMarkerNum /* Marker index */, 1 /* Marker width */, markerRoot.markerMatrix
+        hiroMarkerNum /* Marker index */,
+        1 /* Marker width */,
+        markerRoot.markerMatrix
       );
 
       // position camera
@@ -244,10 +235,17 @@ function startProcessing() {
       // m.transpose();
       // camera.applyMatrix4(m);
 
-      let preCalculatedMatrix = [0.8674437212769462, -0.06138414161301458, -0.49373411627680386, 0, -0.0019110548031015656, 0.9919415432598282, -0.12668197434855205, 0, 0.497531645512864, 0.11083303620198617, 0.8603361551158427, 0, -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1];
-      preCalculatedMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -3, 1]
-      preCalculatedMatrix = [1, -0, -0.5, 0, -0, 1, -0, 0, 0.5, 0, 1, 0, -0, -0, -2, 1];
-      
+      let preCalculatedMatrix = [
+        0.8674437212769462, -0.06138414161301458, -0.49373411627680386, 0,
+        -0.0019110548031015656, 0.9919415432598282, -0.12668197434855205, 0,
+        0.497531645512864, 0.11083303620198617, 0.8603361551158427, 0,
+        -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1,
+      ];
+      preCalculatedMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -3, 1];
+      preCalculatedMatrix = [
+        1, -0, -0.5, 0, -0, 1, -0, 0, 0.5, 0, 1, 0, -0, -0, -2, 1,
+      ];
+
       // markerRoot.matrix.elements = preCalculatedMatrix;
 
       /*
@@ -262,9 +260,7 @@ function startProcessing() {
       console.log(markerRoot.matrix.elements);
       console.log(markerRoot);
       console.log(camera);
-
     } else {
-
       // not found
       markerRoot.visible = false;
     }
@@ -281,7 +277,6 @@ function startProcessing() {
     // window.requestAnimationFrame(processFrame);
   };
 
-
   // initialize camera projection matrix
   const cameraMatrix = arc.getCameraMatrix();
   camera.projectionMatrix.fromArray(cameraMatrix);
@@ -296,8 +291,13 @@ function startProcessing() {
   // Expose variables to the window object
   // For dev purposes only.
   window.app = {
-    THREE, camera, markerRoot, renderer, scene, rerender
-  }
+    THREE,
+    camera,
+    markerRoot,
+    renderer,
+    scene,
+    rerender,
+  };
   for (const v in window.app) {
     window[v] = window.app[v];
   }
