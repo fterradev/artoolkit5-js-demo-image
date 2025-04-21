@@ -132,7 +132,7 @@ function initRenderer() {
   // camera.position.z = 2;
   
   // Apply transformation to the camera
-  // const m = new THREE.Matrix4(...[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1]);
+  // const m = new THREE.Matrix4(...[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, 1]);
   // m.transpose();
   // camera.applyMatrix4(m);
 
@@ -282,4 +282,13 @@ function startProcessing() {
   camera.projectionMatrix.fromArray(cameraMatrix);
 
   processFrame();
+
+  // Expose variables to the window object
+  // For dev purposes only.
+  window.app = {
+    THREE, camera, markerRoot
+  }
+  for (const v in window.app) {
+    window[v] = window.app[v];
+  }
 }
