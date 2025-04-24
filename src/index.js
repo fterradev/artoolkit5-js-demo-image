@@ -121,7 +121,7 @@ function initRenderer() {
   */
   // camera.matrixAutoUpdate = false;
 
-  // camera.position.z = 2;
+  // camera.position.z = 1;
 
   // Apply transformation to the camera
   // const m = new THREE.Matrix4(...[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, 1]);
@@ -241,10 +241,10 @@ function startProcessing() {
         0.497531645512864, 0.11083303620198617, 0.8603361551158427, 0,
         -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1,
       ];
-      preCalculatedMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -3, 1];
-      preCalculatedMatrix = [
-        1, -0, -0.5, 0, -0, 1, -0, 0, 0.5, 0, 1, 0, -0, -0, -2, 1,
-      ];
+      // preCalculatedMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -3, 1];
+      // preCalculatedMatrix = [
+      //   1, -0, -0.5, 0, -0, 1, -0, 0, 0.5, 0, 1, 0, -0, -0, -2, 1,
+      // ];
 
       // markerRoot.matrix.elements = preCalculatedMatrix;
 
@@ -288,6 +288,15 @@ function startProcessing() {
     renderer.render(scene, camera);
   };
 
+  const r = rerender;
+
+  let preCalculatedMatrix = [
+    0.8674437212769462, -0.06138414161301458, -0.49373411627680386, 0,
+    -0.0019110548031015656, 0.9919415432598282, -0.12668197434855205, 0,
+    0.497531645512864, 0.11083303620198617, 0.8603361551158427, 0,
+    -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1,
+  ];
+
   // Expose variables to the window object
   // For dev purposes only.
   window.app = {
@@ -297,6 +306,8 @@ function startProcessing() {
     renderer,
     scene,
     rerender,
+    r,
+    preCalculatedMatrix,
   };
   for (const v in window.app) {
     window[v] = window.app[v];
