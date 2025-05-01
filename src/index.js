@@ -15,7 +15,7 @@ let arc;
 let markerId;
 
 // used to render THREE.js scene
-let renderer, scene, camera, markerRoot;
+let renderer, scene, camera, markerRoot, plane;
 
 window.addEventListener("DOMContentLoaded", () => {
   initCamera(cameraConfig)
@@ -124,7 +124,7 @@ function initRenderer() {
   // camera.position.z = 1;
 
   // Apply transformation to the camera
-  // const m = new THREE.Matrix4(...[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, 1]);
+  // const m = new THREE.Matrix4(...[0.955378691859105, 0.05389065584368067, 0.29042615645689096, 0, -0.13141462512479588, 0.9580979177615311, 0.2545163575967703, 0, -0.26454064233099683, -0.2813257492547615, 0.9224283556793725, 0, -0.040522827533962635, -0.18889817888618501, -1.7069692423548555, 1]);
   // m.transpose();
   // camera.applyMatrix4(m);
 
@@ -162,7 +162,7 @@ function initRenderer() {
   const geometry = new THREE.PlaneGeometry(1, 1);
   const material = new THREE.MeshBasicMaterial({ map: pin });
   // const material = new THREE.MeshLambertMaterial({ map: pin })
-  const plane = new THREE.Mesh(geometry, material);
+  plane = new THREE.Mesh(geometry, material);
 
   // Use this to get a "default" view of the markerRoot
   // plane.position.z = -1;
@@ -297,6 +297,56 @@ function startProcessing() {
     -0.0805811349599389, -0.21148630540820565, -2.1353259754643057, 1,
   ];
 
+  /*
+  p = new THREE.Vector3()
+  markerRoot.getWorldDirection(p)
+  l = new THREE.Plane()
+  l.setFromNormalAndCoplanarPoint(p, markerRoot.position)
+  d = l.constant // maybe just d = p.z;
+  // 0.499823430764588
+  w = [d, 0, 0, 0,
+      0, d, 0, 0,
+      0, 0, d, 0,
+      -p.x, -p.y, -p.z, 0]
+  */
+
+ 
+ /* 
+  acp = new THREE.Vector3(0, 0, -1);
+  p = new THREE.Vector3(-0.2958016704458744, -0.8140503116025123, 0.499823430764588);
+  l = new THREE.Plane()
+  l.setFromNormalAndCoplanarPoint(p, acp);
+  helper = new THREE.PlaneHelper( l, 1, 0xffff00 );
+  scene.add( helper );
+  r();
+
+  // Pode pular a parte anterior
+
+  ac = [0.8891530354489379, -0.04338691076160181, 0.4555485215940282, 0, -0.3491536213665417, 0.5791715343094981, 0.7366492262482951, 0, -0.2958016704458744, -0.8140503116025123, 0.499823430764588, 0, 0.05229162391253494, -0.0020304688509232742, -1.8116771377517122, 1];
+  acm = new THREE.Matrix4(...ac);
+  acm.transpose()
+
+  j = markerRoot.matrix.clone()
+  ij = markerRoot.matrix.clone().invert();
+  actualPlaneShadowProjection = [0.499823430764588, 0, 0, 0, 0, 0.499823430764588, 0, 0, 0, 0, 0.499823430764588, 0, 0.2958016704458744, 0.8140503116025123, -0.499823430764588, 0];
+  k = new THREE.Matrix4(...actualPlaneShadowProjection);
+  markerRoot.applyMatrix4(k);
+  r();
+
+  // Observe que agora markerRoot.matrix é totalmente diferente de j.
+
+  camera.position.z = 1;r(); // isto é para conseguir ver. Mas talvez seja incorreto.
+  camera.applyMatrix4(acm);r();
+
+  // Poderia ver o que acontece se colocar a camera com z=1 no actual-plane.
+  // Será que muda alguma coisa? Tem que ser mudado ANTES do processFrame.
+
+  // camera.applyMatrix4(j); r();
+
+  // camera.applyMatrix4(ij); r();
+ */
+
+
   // Expose variables to the window object
   // For dev purposes only.
   window.app = {
@@ -308,6 +358,7 @@ function startProcessing() {
     rerender,
     r,
     preCalculatedMatrix,
+    plane
   };
   for (const v in window.app) {
     window[v] = window.app[v];
